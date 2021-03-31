@@ -1,0 +1,131 @@
+version: '2'
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  mongodb:
+    container_name: cm-mongodb
+    image: 'mongo'
+    networks:
+      - app-tier
+    ports:
+      - "27017:27017"
+  zookeeper:
+    container_name: cm-zookeeper-server
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    image: 'bitnami/zookeeper'
+    networks:
+      - app-tier
+    ports:
+      - "2181:2181"
+  kafka:
+    container_name: cm-kafka-server
+    depends_on:
+      - zookeeper
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+    image: bitnami/kafka
+    ports:
+      - "9093:9093"
+    networks:
+      - app-tier
+  covid-monitor-commons:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    image: covid-monitor:latest
+  covid-monitor-server:
+    build:
+      context: .
+      dockerfile: services/server/Dockerfile
+    container_name: cm-server
+    depends_on:
+      - mongodb
+      - kafka
+      - covid-monitor-commons
+    environment:
+      - MONGO_HOST=mongodb
+      - KAFKA_BOOTSTRAP_SERVER=kafka:9092
+      - KAFKA_TOPIC_LOG=COVID_MONITOR_LOG
+    networks:
+      - app-tier
+    ports:
+      - "5000:5000"
+  covid-api-client:
+    build:
+      args:
+        COVID_API_URL: https://api.covid19api.com/summary
+      context: .
+      dockerfile: services/client/Dockerfile
+    container_name: cm-api-client
+    depends_on:
+      - kafka
+      - covid-monitor-commons
+    environment:
+      - KAFKA_BOOTSTRAP_SERVER=kafka:9092
+      - KAFKA_TOPIC_COVID_SUMMARY=COVID_MONITOR_SUMMARY
+      - KAFKA_TOPIC_LOG=COVID_MONITOR_LOG
+      - KAFKA_TOPIC_SCHEDULER=COVID_MONITOR_SCHEDULER
+    networks:
+      - app-tier
+  covid-monitor-register:
+    build:
+      args:
+        SERVER_URL: http://covid-monitor-server:5000
+      context: .
+      dockerfile: services/register/Dockerfile
+    container_name: cm-register
+    depends_on:
+      - covid-monitor-server
+      - kafka
+      - covid-monitor-commons
+    environment:
+      - KAFKA_BOOTSTRAP_SERVER=kafka:9092
+      - KAFKA_TOPIC_COVID_SUMMARY=COVID_MONITOR_SUMMARY
+      - KAFKA_TOPIC_LOG=COVID_MONITOR_LOG
+    networks:
+      - app-tier
+  covid-monitor-scheduler:
+    build:
+      context: .
+      dockerfile: services/scheduler/Dockerfile
+    container_name: cm-scheduler
+    depends_on:
+      - kafka
+      - covid-monitor-commons
+    environment:
+      - NEW_JOB_INTERVAL=1
+      - KAFKA_BOOTSTRAP_SERVER=kafka:9092
+      - KAFKA_TOPIC_LOG=COVID_MONITOR_LOG
+      - KAFKA_TOPIC_SCHEDULER=COVID_MONITOR_SCHEDULER
+    networks:
+      - app-tier
+    volumes:
+      - D:\dev\tmp\covid-19-monitor:/logs/covid19-monitor
+  covid-monitor-logger:
+    build:
+      args:
+        LOG_DIR: /logs/covid19-monitor
+        LOG_FILE: covid19-monitor.log
+      context: .
+      dockerfile: services/logger/Dockerfile
+    container_name: cm-logger
+    depends_on:
+      - kafka
+      - covid-monitor-commons
+    environment:
+      - KAFKA_BOOTSTRAP_SERVER=kafka:9092
+      - KAFKA_TOPIC_LOG=COVID_MONITOR_LOG
+    networks:
+      - app-tier
+    volumes:
+      - D:\dev\tmp\covid-19-monitor:/logs/covid19-monitor
