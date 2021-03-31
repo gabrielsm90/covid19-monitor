@@ -8,6 +8,7 @@ the Kafka MQ.
 """
 
 import json
+import logging
 import uuid
 
 from kafka import KafkaConsumer, KafkaProducer
@@ -15,10 +16,13 @@ from kafka import KafkaConsumer, KafkaProducer
 from services.common.lib.config import Config
 
 
+logger = logging.getLogger(Config.LOG_NAME)
+
+
 class CovidMonitorKafkaConsumer(KafkaConsumer):
     """Kafka message consumer."""
 
-    def __init__(self, topic: str, group_id: str):
+    def __init__(self, topic: str, group_id: str, auto_offset_reset: str = "latest"):
         """
         Create new consumer with provided configuration.
 
@@ -30,6 +34,11 @@ class CovidMonitorKafkaConsumer(KafkaConsumer):
                 https://jaceklaskowski.gitbooks.io/
                 apache-kafka/content/
                 kafka-properties-group-id.html
+            auto_offset_reset(str): A policy for resetting offsets
+                on OffsetOutOfRange errors: ‘earliest’ will move to
+                the oldest available message, ‘latest’ will move to
+                the most recent. Any other value will raise the exception.
+                Default: ‘latest’.
         """
         super().__init__(
             topic,
@@ -38,6 +47,7 @@ class CovidMonitorKafkaConsumer(KafkaConsumer):
             max_poll_records=1,
             group_id=group_id,
             api_version=(0, 10, 1),
+            auto_offset_reset=auto_offset_reset
         )
 
     def consume(self):
@@ -83,7 +93,7 @@ class CovidMonitorKafkaProducer(KafkaProducer):
                 with info such as the topic and
                 the message's offset.
         """
-        print(
+        logger.info(
             f"Message {record_metadata.offset} published "
             f"successfully in topic {record_metadata.topic}. "
             f"Body: {body}"

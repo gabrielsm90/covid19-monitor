@@ -5,12 +5,15 @@ Covid 19 API Client.
 This module defines a client to the Covid 19 public API.
 
 """
-
+import logging
 from typing import Any, Dict
 
 import requests
 
 from services.common.lib.config import Config
+
+
+logger = logging.getLogger(Config.LOG_NAME)
 
 
 class CovidAPIClient:
@@ -32,6 +35,10 @@ class CovidAPIClient:
             Dict[str, Union[str, int]]: JSON with
                 the statistics.
         """
-        response = requests.get(Config.COVID_API_URL)
-        response.raise_for_status()
-        return response.json()
+        try:
+            response = requests.get(Config.COVID_API_URL)
+            response.raise_for_status()
+            logger.info("Covid 19 summary fetched successfully")
+            return response.json()
+        except Exception:
+            logger.exception("Failed to fetch Covid API")

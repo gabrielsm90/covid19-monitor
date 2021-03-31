@@ -1,0 +1,11 @@
+# Pytest generated files
+*/.pytest_cache/
+*.coverage
+*.coverage.*
+
+# Log files
+*.log
+
+# IDE
+.idea/
+*__pycache__*

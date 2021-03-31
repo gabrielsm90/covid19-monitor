@@ -3,7 +3,7 @@
 max-line-length = 88
 
 per-file-ignores =
-    tests/*: F811, S101
+    */tests/*: F811, S101
     */__init__.py: F403, F401, D104
 
 application_import_names = services
