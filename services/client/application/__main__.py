@@ -9,10 +9,10 @@ fetches the API, formats the stats and publishes the result to the
 Covid Summary queue.
 
 """
-
 from services.client.application.covid_api.client import CovidAPIClient
 from services.client.application.message_broker.listener import CovidNewJobListener
 from services.client.application.message_broker.publisher import CovidSummaryPublisher
+import services.common.lib.utils.log  # noqa F401 -> Initializes log handlers.
 
 
 if __name__ == "__main__":

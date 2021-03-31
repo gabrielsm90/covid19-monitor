@@ -13,6 +13,7 @@ from services.common.lib.utils.covid_monitor_kafka import (
     CovidMonitorKafkaConsumer,
     CovidMonitorKafkaProducer,
 )
+import services.common.lib.utils.log  # noqa F401 -> Initializes log handlers.
 
 
 if __name__ == "__main__":
