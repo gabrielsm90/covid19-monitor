@@ -4,8 +4,8 @@ ENV PYTHONPATH=/covid-monitor
 
 RUN mkdir -p /covid-monitor/services
 
-WORKDIR /covid-monitor/services
+WORKDIR /covid-monitor
 
-ADD ./services/common ./common
+ADD ./common ./common
 
 RUN pip install -r ./common/requirements.txt

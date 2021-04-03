@@ -1,9 +1,12 @@
+"""Tests suite for the CovidAPIClient class."""
+
 import mock
 
 from services.client.application.covid_api.client import CovidAPIClient
 
 
 def test_get_covid_summary_with_success():
+    """Test fetching summary with success."""
     response = CovidAPIClient.get_covid_summary()
     assert isinstance(response, dict)
     assert "Countries" in response
@@ -21,7 +24,21 @@ def test_get_covid_summary_with_success():
 
 @mock.patch("services.client.application.covid_api.client.Config.COVID_API_URL")
 @mock.patch("services.client.application.covid_api.client.logger.exception")
-def test_get_covid_summary_with_error(log_mock, api_url_mock):
+def test_get_covid_summary_with_error(
+    log_mock: mock.MagicMock, api_url_mock: mock.MagicMock
+):
+    """
+    Tests covid summary with error response.
+
+    A fake url is provided to force the error.
+
+    Args:
+        log_mock (mock.MagicMock): Mock for logging.exception
+            function. That function should be called once in
+            this case.
+        api_url_mock (mock.MagicMock): Mock for covid api in
+            the configuration.
+    """
     invalid_url = "http://localhost:101010/"
     api_url_mock.return_value = invalid_url
     response = CovidAPIClient.get_covid_summary()

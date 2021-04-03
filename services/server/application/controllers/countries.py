@@ -76,5 +76,7 @@ def create_one():
         Response to be sent to the client.
     """
     data = request.json
+    if get_country(data["country_code"]):
+        return "Country already exists.", 400
     create_country(data)
     return "Country Summary Created", 201

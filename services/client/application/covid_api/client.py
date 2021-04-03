@@ -10,7 +10,7 @@ from typing import Any, Dict
 
 import requests
 
-from services.common.lib.config import Config
+from common.lib.config import Config
 
 
 logger = logging.getLogger(Config.LOG_NAME)

@@ -109,8 +109,6 @@ services:
       - KAFKA_TOPIC_SCHEDULER=COVID_MONITOR_SCHEDULER
     networks:
       - app-tier
-    volumes:
-      - D:\dev\tmp\covid-19-monitor:/logs/covid19-monitor
   covid-monitor-logger:
     build:
       args:

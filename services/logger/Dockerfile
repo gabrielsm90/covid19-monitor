@@ -8,6 +8,6 @@ ENV LOG_DIR=$LOG_DIR \
 
 RUN mkdir -p $LOG_DIR
 
-ADD ./services/logger ./logger
+ADD ./services/logger ./services/logger
 
-ENTRYPOINT python logger/application
+ENTRYPOINT python services/logger/application

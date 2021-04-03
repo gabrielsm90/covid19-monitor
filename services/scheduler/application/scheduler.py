@@ -7,12 +7,11 @@ at each X minutes (configurable).
 
 from datetime import datetime
 import logging
-import uuid
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from services.common.lib.config import Config
-from services.common.lib.utils.covid_monitor_kafka import CovidMonitorKafkaProducer
+from common.lib.config import Config
+from services.scheduler.application.communication.kafka.publisher import NewJobPublisher
 
 
 logger = logging.getLogger(Config.LOG_NAME)
@@ -33,20 +32,13 @@ class NewJobScheduler(BlockingScheduler):
         service.
         """
         super().__init__()
-        self.new_job_producer = CovidMonitorKafkaProducer(
-            topic=Config.KAFKA_TOPIC_SCHEDULER
-        )
-        logger.info(
-            f"New jobs scheduled at: {Config.KAFKA_BOOTSTRAP_SERVER} "
-            f"- Topic {Config.KAFKA_TOPIC_SCHEDULER}"
-        )
+        self.new_job_producer = NewJobPublisher()
 
     def start(self):
         """Start scheduler."""
         self.add_job(
-            self.new_job_producer.publish_message,
+            self.new_job_producer.publish_new_job,
             trigger="interval",
-            args=({"job_id": uuid.uuid4().hex},),
             minutes=Config.NEW_JOB_INTERVAL,
             next_run_time=datetime.now(),
         )

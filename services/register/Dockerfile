@@ -4,8 +4,8 @@ ARG SERVER_URL
 
 ENV SERVER_URL=$SERVER_URL
 
-ADD ./services/register ./register
+ADD ./services/register ./services/register
 
-RUN pip install -r ./register/requirements.txt
+RUN pip install -r ./services/register/requirements.txt
 
-ENTRYPOINT python register/application
+ENTRYPOINT python services/register/application

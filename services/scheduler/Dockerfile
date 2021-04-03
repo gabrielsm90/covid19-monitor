@@ -1,7 +1,7 @@
 FROM covid-monitor:latest
 
-ADD ./services/scheduler ./scheduler
+ADD ./services/scheduler ./services/scheduler
 
-RUN pip install -r ./scheduler/requirements.txt
+RUN pip install -r ./services/scheduler/requirements.txt
 
-ENTRYPOINT python scheduler/application
+ENTRYPOINT python services/scheduler/application

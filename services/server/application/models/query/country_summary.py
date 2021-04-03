@@ -30,10 +30,7 @@ def get_countries():
     Returns:
         JSON with all summaries.
     """
-    try:
-        response = CountrySummary.objects()
-    except CountrySummary.DoesNotExist:
-        return None
+    response = CountrySummary.objects()
     return json.loads(response.to_json())
 
 

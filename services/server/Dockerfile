@@ -1,7 +1,7 @@
 FROM covid-monitor:latest
 
-ADD ./services/server ./server
+ADD ./services/server ./services/server
 
-RUN pip install -r ./server/requirements.txt
+RUN pip install -r ./services/server/requirements.txt
 
-ENTRYPOINT python server/application
+ENTRYPOINT python services/server/application
