@@ -10,7 +10,7 @@ application's logger.
 import logging
 
 from common.lib.config import Config
-from common.lib.utils.covid_monitor_kafka import CovidMonitorKafkaProducer
+from common.lib.communication.mom.brokers.kafkamq import CovidMonitorKafkaProducer
 
 
 class KafkaLoggingHandler(logging.StreamHandler):
@@ -30,7 +30,7 @@ class KafkaLoggingHandler(logging.StreamHandler):
         to the Message broker.
         """
         super(KafkaLoggingHandler, self).__init__()
-        self.producer = CovidMonitorKafkaProducer(Config.KAFKA_TOPIC_LOG)
+        self.producer = CovidMonitorKafkaProducer(Config.KAFKA["TOPIC_LOG"])
 
     def emit(self, record):
         """

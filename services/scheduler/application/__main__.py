@@ -5,7 +5,7 @@ Keeps running and scheduling new Jobs
 at each X minutes (configurable).
 """
 
-import common.lib.utils.log  # noqa F401 -> Initializes log handlers.
+import common.lib.log  # noqa F401 -> Initializes log handlers.
 from services.scheduler.application.scheduler import NewJobScheduler
 
 

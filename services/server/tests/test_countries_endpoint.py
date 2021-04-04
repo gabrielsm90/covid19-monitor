@@ -96,7 +96,7 @@ def test_get_one_country_not_found_response(app_test_client: FlaskClient):
         app_test_client (FlaskClient): App's HTTP client.
     """
     clean_database()
-    response = app_test_client.get(f"countries/ZZ")
+    response = app_test_client.get("countries/ZZ")
     assert response.status_code == 404
     assert response.get_data().decode() == "Not Found"
 

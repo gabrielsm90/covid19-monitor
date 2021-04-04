@@ -2,3 +2,8 @@
 
 omit =
     application/__main__.py
+
+[report]
+
+exclude_lines =
+    raise NotImplementedError

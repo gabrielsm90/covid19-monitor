@@ -43,7 +43,7 @@ class CovidMonitorKafkaConsumer(KafkaConsumer):
         """
         super().__init__(
             topic,
-            bootstrap_servers=[Config.KAFKA_BOOTSTRAP_SERVER],
+            bootstrap_servers=[Config.KAFKA["HOST"]],
             enable_auto_commit=True,
             max_poll_records=1,
             group_id=group_id,
@@ -76,7 +76,7 @@ class CovidMonitorKafkaProducer(KafkaProducer):
         """
         self.topic = topic
         super().__init__(
-            bootstrap_servers=[Config.KAFKA_BOOTSTRAP_SERVER], api_version=(0, 10, 1)
+            bootstrap_servers=[Config.KAFKA["HOST"]], api_version=(0, 10, 1)
         )
 
     @staticmethod

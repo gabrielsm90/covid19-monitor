@@ -9,20 +9,25 @@ fetches the API, formats the stats and publishes the result to the
 Covid Summary queue.
 
 """
+from common.lib.config import Config
+import common.lib.log  # noqa F401 -> Initializes log handlers.
 from services.client.application.covid_api.client import CovidAPIClient
-from services.client.application.communication.kafka.listener import CovidNewJobListener
-from services.client.application.communication.kafka.publisher import (
-    CovidSummaryPublisher,
+from services.client.application.communication.factory import (
+    CovidSummaryPublisherFactory,
+    NewJobListenerFactory,
 )
-import common.lib.utils.log  # noqa F401 -> Initializes log handlers.
 
 
 if __name__ == "__main__":
     covid_api_client = CovidAPIClient()
-    publisher = CovidSummaryPublisher()
-    new_job_listener = CovidNewJobListener()
+    covid_summary_publisher = CovidSummaryPublisherFactory.get_covid_summary_publisher(
+        Config.MESSAGE_QUEUE
+    )()
+    new_job_listener = NewJobListenerFactory.get_new_job_listener(
+        Config.MESSAGE_QUEUE
+    )()
     for _ in new_job_listener.consume():
         covid_summary = covid_api_client.get_covid_summary()
         if covid_summary:
             for country_summary in covid_summary.get("Countries", []):
-                publisher.publish_summary(country_summary)
+                covid_summary_publisher.publish(country_summary)

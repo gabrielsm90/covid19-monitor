@@ -3,7 +3,7 @@
 import mock
 
 from common.lib.config import Config
-from common.lib.utils.covid_monitor_kafka import (
+from common.lib.communication.mom.brokers.kafkamq import (
     CovidMonitorKafkaProducer,
     CovidMonitorKafkaConsumer,
 )
@@ -13,7 +13,7 @@ def test_create_covid_monitor_kafka_consumer():
     """Test create new kafka consumer."""
     consumer = CovidMonitorKafkaConsumer("topic", "group_id")
     assert hasattr(consumer, "config")
-    assert Config.KAFKA_BOOTSTRAP_SERVER in consumer.config.get("bootstrap_servers")
+    assert Config.KAFKA["HOST"] in consumer.config.get("bootstrap_servers")
     assert consumer.config.get("group_id") == "group_id"
 
 
@@ -21,10 +21,10 @@ def test_create_covid_monitor_kafka_producer():
     """Test create new kafka producer."""
     producer = CovidMonitorKafkaProducer("topic")
     assert hasattr(producer, "config")
-    assert Config.KAFKA_BOOTSTRAP_SERVER in producer.config.get("bootstrap_servers")
+    assert Config.KAFKA["HOST"] in producer.config.get("bootstrap_servers")
 
 
-@mock.patch("common.lib.utils.covid_monitor_kafka.logger.info")
+@mock.patch("common.lib.communication.mom.brokers.kafkamq.logger.info")
 def test_publish_message_to_covid_monitor_kafka(log_mock: mock.MagicMock):
     """
     Test publish message to kafka.

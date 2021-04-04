@@ -11,7 +11,7 @@ import logging
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 from common.lib.config import Config
-from services.scheduler.application.communication.kafka.publisher import NewJobPublisher
+from services.scheduler.application.communication.factory import NewJobPublisherFactory
 
 
 logger = logging.getLogger(Config.LOG_NAME)
@@ -32,12 +32,14 @@ class NewJobScheduler(BlockingScheduler):
         service.
         """
         super().__init__()
-        self.new_job_producer = NewJobPublisher()
+        self.new_job_producer = NewJobPublisherFactory.get_new_job_publisher(
+            Config.MESSAGE_QUEUE
+        )()
 
     def start(self):
         """Start scheduler."""
         self.add_job(
-            self.new_job_producer.publish_new_job,
+            self.new_job_producer.publish,
             trigger="interval",
             minutes=Config.NEW_JOB_INTERVAL,
             next_run_time=datetime.now(),

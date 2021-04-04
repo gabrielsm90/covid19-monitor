@@ -1,23 +1,26 @@
 """Module to provide a Kafka listener of new summaries."""
 
 from common.lib.config import Config
-from common.lib.utils.covid_monitor_kafka import (
-    CovidMonitorKafkaConsumer,
-)
+from common.lib.communication.mom import Listener
+from common.lib.communication.mom.brokers.kafkamq import CovidMonitorKafkaConsumer
 
 
-class CovidSummaryConsumer(CovidMonitorKafkaConsumer):
+class KafkaCovidSummaryListener(Listener):
     """Covid Summary consumer."""
 
     def __init__(self, **kwargs):
         """Create new Summary consumer with data from config."""
         super().__init__(
-            topic=Config.KAFKA_TOPIC_COVID_SUMMARY, group_id="job_scheduler", **kwargs
+            CovidMonitorKafkaConsumer(
+                topic=Config.KAFKA["TOPIC_COVID_SUMMARY"],
+                group_id="job_scheduler",
+                **kwargs
+            )
         )
 
     def consume(self):
         """Consume messages from queue. Yields formatted messages."""
-        for summary_message in super().consume():
+        for summary_message in self.listener.consume():
             covid_summary = {
                 "country": summary_message["Country"],
                 "country_code": summary_message["CountryCode"],

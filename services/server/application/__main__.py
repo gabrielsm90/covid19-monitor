@@ -11,7 +11,7 @@ This module starts the app.
 from mongoengine import connect
 
 from common.lib.config import Config
-import common.lib.utils.log  # noqa F401 -> Initializes log handlers.
+import common.lib.log  # noqa F401 -> Initializes log handlers.
 from services.server.application.app import app
 
 
